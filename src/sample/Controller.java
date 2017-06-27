@@ -1,6 +1,7 @@
 package sample;
 
 
+import FileInfo.FileInfoData;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -111,6 +112,8 @@ public class Controller implements Initializable {
         allFileNumTxF.setText(String.valueOf(fileNum));
 //        System.out.println("filesLength is "+ fileNum);
 
+
+        //ここから
         ///全ファイルの中からjpg,jpeg形式のフィルタリングするフィルタの設定
         FilenameFilter picFilter = new FilenameFilter() {
             @Override
@@ -128,7 +131,16 @@ public class Controller implements Initializable {
         File[] picFiltedFiles = new File(dirTxF.getText()).listFiles(picFilter);
         int picFileNum = picFiltedFiles.length;
         picFileNumTxF.setText(String.valueOf(picFileNum));
+        //ここまで
 
+        FileInfoData fid = new FileInfoData();
+        FilenameFilter picFilter2 = fid.createFilter("jpg","jpeg");
+        File onlyPicFiles[] = fid.createFilredFiles(dirTxF.getText(),picFilter2);
+        int picFileNum2 = onlyPicFiles.length;
+        System.out.println(picFileNum +"前　比較　後"+picFileNum2);
+
+
+        ////
 
         ObservableList<String> fileslist = FXCollections.observableArrayList();
 
