@@ -9,9 +9,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import javax.swing.text.html.parser.Entity;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
@@ -19,7 +22,6 @@ import java.util.Observable;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-//public class Controller{
 
     @FXML
     private Button okbtn;
@@ -48,6 +50,21 @@ public class Controller implements Initializable {
     @FXML
     private TextField picFileNumTxF;
 
+    @FXML
+    private CheckBox chkjpeg;
+
+    @FXML
+    private CheckBox chkpng;
+
+    @FXML
+    private CheckBox chkjpg;
+
+    @FXML
+    private CheckBox chkraw;
+
+    @FXML
+    private CheckBox chkall;
+
     //DirChooser
     private DirectoryChooser DCer = new DirectoryChooser();
 
@@ -64,10 +81,11 @@ public class Controller implements Initializable {
                         dirTxF.textProperty().isEmpty(),
                         extenTxF.textProperty().isEmpty()
                 ));
+        chkall.setSelected(true);
     }
 
     @FXML
-    protected void onCheese(ActionEvent evt){
+    protected void onChoose(ActionEvent evt){
         try{
             String homeDir = dirTxF.textProperty().get();
             if(homeDir != null && !homeDir.isEmpty()){
@@ -82,24 +100,15 @@ public class Controller implements Initializable {
             if(selectedDir != null){
                 dirTxF.setText(selectedDir.getAbsolutePath());
                 dirTxF.requestFocus();
+
+                //選択したフォルダの中のすべての拡張子をピックアップ
+                //
+//                String kaku[] = ;
+
             }
         } catch (Exception ex){
             new ErrorDialog().showErrorException(ex);
         }
-    }
-
-    @FXML
-    protected void onOKbtn2(ActionEvent evt){
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText("実行します");
-
-        StringBuffer buf = new StringBuffer();
-        buf.append("dir=").append(dirTxF.getText()).append("\r\n")
-                .append("namePattern=").append(extenTxF.getText()).append("\r\n")
-                .append(Chkbox.isSelected() ? "Yes" : "No");
-        alert.setContentText(buf.toString());
-
-        alert.showAndWait();
     }
 
     @FXML
@@ -111,6 +120,43 @@ public class Controller implements Initializable {
         int fileNum = files.length;
         allFileNumTxF.setText(String.valueOf(fileNum));
 //        System.out.println("filesLength is "+ fileNum);
+
+        //check boxの数
+        int CHKNUM = 1;
+        int j = 0;
+//ERROR        String chkString[] = new String[CHKNUM];
+        String[] chkString = new String[CHKNUM];
+
+
+
+        if(chkall.isSelected()){
+            chkString[j] = "*";
+            j++;
+        }
+        if(chkjpeg.isSelected()){
+            chkString[j] = "jpeg";
+            j++;
+            chkString[j] = "JPEG";
+            j++;
+        }
+        if(chkjpg.isSelected()){
+            chkString[j] = "jpg";
+            j++;
+            chkString[j] = "JPG";
+            j++;
+        }
+        if(chkpng.isSelected()){
+            chkString[j] = "png";
+            j++;
+            chkString[j] = "PNG";
+            j++;
+        }
+        if(chkraw.isSelected()){
+            chkString[j] = "raw";
+            j++;
+            chkString[j] = "RAW";
+            j++;
+        }
 
 
         //ここから
@@ -133,11 +179,26 @@ public class Controller implements Initializable {
         picFileNumTxF.setText(String.valueOf(picFileNum));
         //ここまで
 
+
+        //ファイルフィルタリングのために使うインスタンス
         FileInfoData fid = new FileInfoData();
+
         FilenameFilter picFilter2 = fid.createFilter("jpg","jpeg");
-        File onlyPicFiles[] = fid.createFilredFiles(dirTxF.getText(),picFilter2);
+        File onlyPicFiles[] = fid.createFiltedFiles(dirTxF.getText(),picFilter2);
         int picFileNum2 = onlyPicFiles.length;
         System.out.println(picFileNum +"前　比較　後"+picFileNum2);
+
+
+
+        FileInfoData fid2 = new FileInfoData();
+
+        //これのchkStringがよくないはず
+        //chkStirngにnull[なんでもないもの]が入っているはず
+        FilenameFilter picFilter3 = fid2.createFilter(chkString);
+
+        File chkedPicFiles[] = fid2.createFiltedFiles(dirTxF.getText(),picFilter3);
+        int picFileNum3 = chkedPicFiles.length;
+        System.out.println(picFileNum3 +" チェックボックスでフィルタリングした数");
 
 
         ////
